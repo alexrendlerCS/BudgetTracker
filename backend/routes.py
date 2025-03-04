@@ -3,8 +3,61 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from backend.database import db
 from backend.models import User, Expense
 from datetime import datetime
+from flask_cors import CORS  # ✅ Import CORS first
 
-api = Blueprint("api", __name__)  
+api = Blueprint("api", __name__)  # ✅ Define api BEFORE using it
+CORS(api)  # ✅ Apply CORS to all routes within the Blueprint
+
+# -------------------- CORS Handling for Preflight Requests --------------------
+@api.after_request
+def add_cors_headers(response):
+    response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    return response
+
+# -------------------- USER PROFILE (Fetch Budget) --------------------
+@api.route("/profile", methods=["GET"])
+@jwt_required()
+def get_profile():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    return jsonify({
+        "id": user.id,
+        "username": user.username,
+        "budget": float(user.budget) if user.budget is not None else 2000  # ✅ Convert to float
+    }), 200
+
+
+# -------------------- UPDATE BUDGET --------------------
+
+@api.route("/update-budget", methods=["PUT"])
+@jwt_required()
+def update_budget():
+    user_id = get_jwt_identity()
+    data = request.get_json()
+
+    if "budget" not in data:
+        return jsonify({"error": "Missing budget value"}), 400
+
+    try:
+        budget_value = float(data["budget"])  # Ensure it's a valid number
+    except ValueError:
+        return jsonify({"error": "Invalid budget value"}), 400
+
+    user = User.query.filter_by(id=user_id).first()
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    user.budget = budget_value
+    db.session.commit()
+
+    return jsonify({"message": "Budget updated successfully", "budget": user.budget}), 200
 
 # -------------------- USER REGISTRATION --------------------
 @api.route("/register", methods=["POST"])

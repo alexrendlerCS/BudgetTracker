@@ -1,10 +1,9 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import type React from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   BarChart3,
   CreditCard,
@@ -14,12 +13,10 @@ import {
   Moon,
   PieChart,
   PlusCircle,
-  Settings,
-  Sun,
   User,
-} from "lucide-react"
+} from "lucide-react";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Sidebar,
   SidebarContent,
@@ -30,38 +27,39 @@ import {
   SidebarMenuButton,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
+import { Badge } from "@/components/ui/badge"; // Import Badge for "Under Construction" labels
 
 export function AppSidebar() {
-  const pathname = usePathname()
-  const [theme, setTheme] = useState<"light" | "dark">("light")
+  const pathname = usePathname();
+  const [theme, setTheme] = useState<"light" | "dark">("light");
 
   // Check if the current path matches the link
   const isActive = (path: string) => {
-    return pathname === path
-  }
+    return pathname === path;
+  };
 
   // Toggle between light and dark mode
   const toggleTheme = () => {
-    const newTheme = theme === "light" ? "dark" : "light"
-    setTheme(newTheme)
-    document.documentElement.classList.toggle("dark")
-    localStorage.setItem("theme", newTheme)
-  }
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    document.documentElement.classList.toggle("dark");
+    localStorage.setItem("theme", newTheme);
+  };
 
   // Initialize theme from localStorage on component mount
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") as "light" | "dark" | null
+    const savedTheme = localStorage.getItem("theme") as "light" | "dark" | null;
     if (savedTheme) {
-      setTheme(savedTheme)
+      setTheme(savedTheme);
       if (savedTheme === "dark") {
-        document.documentElement.classList.add("dark")
+        document.documentElement.classList.add("dark");
       }
     } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      setTheme("dark")
-      document.documentElement.classList.add("dark")
+      setTheme("dark");
+      document.documentElement.classList.add("dark");
     }
-  }, [])
+  }, []);
 
   return (
     <Sidebar className="border-r border-border">
@@ -97,22 +95,29 @@ export function AppSidebar() {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
+          
+          {/* INSIGHTS TAB (Under Construction) */}
           <SidebarMenuItem>
             <SidebarMenuButton asChild isActive={isActive("/insights")}>
               <Link href="/insights">
                 <PieChart className="h-5 w-5" />
                 <span>Insights</span>
+                <Badge variant="outline" className="ml-2 text-xs">🚧 Under Construction</Badge>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
+
+          {/* TRENDS TAB (Under Construction) */}
           <SidebarMenuItem>
             <SidebarMenuButton asChild isActive={isActive("/trends")}>
               <Link href="/trends">
                 <BarChart3 className="h-5 w-5" />
                 <span>Trends</span>
+                <Badge variant="outline" className="ml-2 text-xs">🚧 Under Construction</Badge>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
+
           <SidebarMenuItem>
             <SidebarMenuButton asChild isActive={isActive("/profile")}>
               <Link href="/profile">
@@ -121,16 +126,9 @@ export function AppSidebar() {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild isActive={isActive("/settings")}>
-              <Link href="/settings">
-                <Settings className="h-5 w-5" />
-                <span>Settings</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarContent>
+
       <SidebarFooter className="border-t border-border p-4">
         <div className="flex flex-col gap-2">
           <Button variant="outline" size="sm" className="justify-start gap-2" onClick={toggleTheme}>
@@ -144,7 +142,7 @@ export function AppSidebar() {
         </div>
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }
 
 export function SidebarWrapper({ children }: { children: React.ReactNode }) {
@@ -160,6 +158,5 @@ export function SidebarWrapper({ children }: { children: React.ReactNode }) {
         </main>
       </div>
     </SidebarProvider>
-  )
+  );
 }
-

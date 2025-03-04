@@ -1,20 +1,22 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy  # ✅ Ensure this is imported
-from flask_jwt_extended import JWTManager  # ✅ Ensure JWT is imported
-from flask_cors import CORS  # ✅ Import CORS
+from flask_sqlalchemy import SQLAlchemy
+from flask_jwt_extended import JWTManager
+from flask_cors import CORS
 from backend.config import Config
 
-db = SQLAlchemy()  # ✅ Define SQLAlchemy instance
-jwt = JWTManager()  # ✅ Define JWTManager instance
+db = SQLAlchemy()
+jwt = JWTManager()
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    db.init_app(app)  # ✅ Initialize database
-    jwt.init_app(app)  # ✅ Initialize JWT authentication
-    CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})  # ✅ Enable CORS for frontend
+    db.init_app(app)
+    jwt.init_app(app)
 
-    from backend import models  # ✅ Ensure models are imported
+    # ✅ Enable CORS with proper headers & methods
+    CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}}, supports_credentials=True)
+
+    from backend import models
 
     return app
